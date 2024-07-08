@@ -2,30 +2,44 @@ package com.example.barimovie
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.fragment.app.Fragment
+import com.example.barimovie.databinding.ActivityMainBinding
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        val movieFragment = MovieFragment()
+        val tvFragment = TVFragment()
+        val profileFragment = ProfileFragment()
 
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
-            var selectedFragment: Fragment? = null
-            when (item.itemId) {
-                R.id.navigation_home -> selectedFragment = HomeFragment()
-                R.id.navigation_trending -> selectedFragment = TrendingFragment()
-                R.id.navigation_profile -> selectedFragment = ProfileFragment()
+        makeCurrentFragment (movieFragment)
+
+        val bottom_navigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottom_navigation.setOnNavigationItemSelectedListener {
+            when(it.itemId){
+                R.id.menu_movie -> makeCurrentFragment(movieFragment)
+                R.id.menu_tv -> makeCurrentFragment(tvFragment)
+                R.id.menu_profile -> makeCurrentFragment(profileFragment)
             }
-            selectedFragment?.let {
-                supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment, it).commit()
-            }
+
             true
         }
 
-        // Set default selection
-        bottomNavigationView.selectedItemId = R.id.navigation_home
+    }
+
+    private fun makeCurrentFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.fragment_container, fragment)
+            commit()
+        }
+
     }
 }
